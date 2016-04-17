@@ -21,5 +21,17 @@ public class GoalElement extends AbstractElement {
          */
         super(x, y, SOURCE);
     }
-
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if(!(obj instanceof GoalElement))
+            return false;
+        GoalElement s = (GoalElement) obj;
+        if(this.getX() == s.getX() && this.getY() == s.getX())
+            return true;
+        return true;
+    }
 }

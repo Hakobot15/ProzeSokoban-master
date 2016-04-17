@@ -1,3 +1,6 @@
+import Model.FloorElement;
+import Model.WallElement;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,12 +11,11 @@ public class mainTesty {
 
     public static void main(String[] args)
     {
-
             EventQueue.invokeLater(() -> {
                 JFrame frame = new View.MainFrame();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setTitle("Sokoban");
             });
-
     }
+
 }

@@ -17,13 +17,24 @@ import java.util.ArrayList;
  */
 public class LevelLoader {
     /**
-     * Zmienne przechowujace zmienne do odczytu mapy
-     * konkretne symbole odpowiadaja za konkretny obiekt graficzny na mapie
+     * @parm @ - zmienna opisujaca polozenie gracza w pliku txt
      */
     private final static char DEFAULT_PLAYER = '@';
+    /**
+     * @parm # - zmienna opisujaca polozenie sciany w pliku txt
+     */
     private final static char DEFAULT_WALL = '#';
+    /**
+     * @parm o - zmienna opisujaca polozenie celu Mapy w pliku txt
+     */
     private final static char DEFAULT_GOAL = 'o';
+    /**
+     * @parm _ - zmienna opisujaca polozenie podlogi w pliku txt
+     */
     private final static char DEFAULT_FLOOR = '_';
+    /**
+     * @parm $ - zmienna opisujaca polozenie skrzynki w pliku txt
+     */
     private final static char DEFAULT_CHEST = '$';
     /**
      * zmienna przechowujaca czas na wykonanie celow mapy
@@ -33,11 +44,14 @@ public class LevelLoader {
      * Lista przechowujaca wszystkie elemnty na mapie
      */
     private ArrayList<AbstractElement> map = new ArrayList<>();
-    /**
-     * zmienne przechowujace wysokosc i szerokosc mapy
-     */
     private int mapWidth;
+    /**
+     * Zmienna przechowujac ilosc wierszy mapy
+     */
     private int mapHeight;
+    /**
+     Zmienna skalujaca tekstury w poziomoe
+     */
     /**
      * zmienne przechowujace polozenie gracza
      */
@@ -55,7 +69,6 @@ public class LevelLoader {
         DataFileReader file = new DataFileReader(fileName);
         time = Integer.parseInt(file.getDataList().get(0));
         mapHeight = file.getDataList().size() - 1 ;
-        System.out.println("String ma dlugosc = "+  file.getDataList().size());
         char item;
         for (int i = 1; i < file.getDataList().size(); ++i) {
             /**

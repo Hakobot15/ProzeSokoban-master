@@ -10,8 +10,17 @@ import java.io.*;
  *
  */
 public class MainFrame extends JFrame {
+	/**
+	 * Zmienna przechowujaca tytul gry
+	 */
 	private final static String TITLE = "Sokoban v1.0.0";
+	/**
+	 * Zmienna przechowujaca standardowa szerokosc okna gry
+	 */
 	private final static int DEFAULT_WIDTH = 520;
+	/**
+	 * Zmienna przechowujaca standardowa wysokosc okna gry
+	 */
 	private final static int DEFAULT_HIGHT = 570;
 	private Action saveAction;
 	private Action newGameAction;
@@ -26,8 +35,6 @@ public class MainFrame extends JFrame {
 		setBounds(new Rectangle(DEFAULT_WIDTH, DEFAULT_HIGHT));
 		makeMenu();
 		this.setResizable(true);
-//		Image image = new ImageIcon("icon.jpg").getImage();
-//		setIconImage(image);
 		newGameStart();
 	}
 	/**

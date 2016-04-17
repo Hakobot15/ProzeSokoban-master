@@ -75,7 +75,5 @@ public class AbstractElement extends JComponent {
     /**
      * metoda przesuwajaca element
      */
-    public void move() {
-
     }
-}
+
