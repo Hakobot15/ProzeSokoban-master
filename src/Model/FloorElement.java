@@ -8,6 +8,7 @@ public class FloorElement extends AbstractElement {
      * Zmienna przechowujaca sciezke do grafiki skrzynki
      */
     private final static String SOURCE = "pic\\floor.png";
+    private final static String MARK = "_";
 
     /**
      * Konstruktor
@@ -34,7 +35,7 @@ public class FloorElement extends AbstractElement {
         FloorElement s = (FloorElement) obj;
         if(this.getX() == s.getX() && this.getY() == s.getX())
             return true;
-        return true;
+        return false;
     }
 }
 

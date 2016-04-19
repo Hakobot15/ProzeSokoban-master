@@ -9,6 +9,7 @@ public class GoalElement extends AbstractElement {
      * Zmienna przechowujaca sciezke do grafiki skrzynki
      */
     private final static String SOURCE = "pic\\goal.png";
+    private final static String MARK = "o";
 
     /**
      * @param x wspolzedna wyswietlenia grafiki
@@ -32,6 +33,6 @@ public class GoalElement extends AbstractElement {
         GoalElement s = (GoalElement) obj;
         if(this.getX() == s.getX() && this.getY() == s.getX())
             return true;
-        return true;
+        return false;
     }
 }

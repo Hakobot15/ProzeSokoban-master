@@ -1,6 +1,5 @@
 package View;
 
-import Controller.Move;
 import Model.*;
 
 import java.awt.*;
@@ -54,7 +53,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 * @param fileName sciezka dostepu do pliku z poziomem gry
 	 * @parm frame przekazuje okna aby mozna bylo obsluzyc event oraz do obliczen zbalansowania tekstur
 	 */
-	public GameAreaPanel(String fileName, JFrame frame) {
+	public GameAreaPanel(String fileName, JFrame frame, int width, int height) {
 		this.frame = frame;
 		LevelLoader level;
 		level = new LevelLoader(fileName);
@@ -65,8 +64,8 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		addComponentListener(this);
 		frame.addWindowStateListener(this);
 		frame.addKeyListener(this);
-		spaceX = (frame.getBounds().width - 20) / mapWidth;
-		spaceY = (frame.getBounds().height - 50) / mapHeight;
+		spaceX = width / mapWidth;
+		spaceY = (height-120) / mapHeight;
 		player = level.getPlayer();
 	}
 
@@ -86,7 +85,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 */
 	public void componentResized(ComponentEvent e) {
 		Rectangle r = getBounds();
-		spaceY = r.height / mapHeight;
+		spaceY = (r.height) / mapHeight;
 		spaceX = r.width / mapWidth;
 	}
 
@@ -119,7 +118,6 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 	}
 
-
 	public void keyPressed(KeyEvent e) {
 
 		int key = e.getKeyCode();
@@ -128,21 +126,21 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			dx = -1;
 		}
 
+		if (key == KeyEvent.VK_LEFT) {
+			dx = 0;
+		}
+
 		if (key == KeyEvent.VK_RIGHT) {
-			dx = 1;
+			dx = 0;
 		}
 
 		if (key == KeyEvent.VK_UP) {
-			dy = -1;
-			System.out.println("Chce isc w gore");
+			dy = 0;
 		}
 
 		if (key == KeyEvent.VK_DOWN) {
-			dy = 1;
+			dy = 0;
 		}
-		move();
-		repaint();
-
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -167,92 +165,5 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	}
 
 	public void keyTyped(KeyEvent e) {
-	}
-
-	public void move() {
-		int tmpX = player.getX();
-		int tmpY = player.getY();
-		player.setX(player.getX() + dx);
-		player.setY(player.getY() + dy);
-		WallElement tmpWa = new WallElement(tmpX, tmpY);
-		FloorElement tmpFl = new FloorElement(tmpX, tmpY);
-		ChestElement tmpCh = new ChestElement(tmpX, tmpY);
-		GoalElement tmpGo = new GoalElement(tmpX, tmpY);
-		for (int i = 0; i < map.size(); i++) {
-			if (tmpWa.equals(map.get(i))) { // jezeli sciana to sie nie moze ruszyc
-				System.out.println(tmpWa.getX()+tmpWa.getY()+" "+ map.get(i).getX()+map.get(i).getY());
-				System.out.println("Jestem w scianie");
-				break;
-			}
-			if (tmpFl.equals(map.get(i))) { // jezelie podloga to sie porusza
-				System.out.println("wszedlem do floora");
-				for (int j = 0; j < map.size(); j++) {
-					if (map.get(j) instanceof PlayerElement) {
-						System.out.println("znalazlo gracza");
-						map.set(i, player);
-						if (tmpElement.equals("_")) {
-							map.set(j, tmpFl);
-							tmpElement = "_";
-							System.out.println("Jestem w podflorze");
-							break;
-						}
-						if (tmpElement.equals("@")) {
-							map.set(j, tmpCh);
-							tmpElement = "_";
-							break;
-						}
-						if (tmpElement.equals("o")) {
-							map.set(j, tmpGo);
-							tmpElement = "_";
-							break;
-						}
-					}
-				}
-			}
-			if (tmpGo.equals(map.get(i))) { // jezeli cel
-				for (int j = 0; i < map.size(); i++) {
-					if (map.get(j) instanceof PlayerElement)
-						map.set(i, player);
-					if (tmpElement.equals("_")) {
-						map.set(j, tmpFl);
-						tmpElement = "o";
-						break;
-					}
-					if (tmpElement.equals("@")) {
-						map.set(j, tmpCh);
-						tmpElement = "o";
-						break;
-					}
-					if (tmpElement.equals("o")) {
-						map.set(j, tmpGo);
-						tmpElement = "o";
-						break;
-					}
-
-				}
-			}
-			if (tmpCh.equals(map.get(i))) {
-				for (int j = 0; i < map.size(); i++) {
-					if (map.get(j) instanceof PlayerElement)
-						map.set(i, player);
-					if (tmpElement.equals("_")) {
-						map.set(j, tmpFl);
-						tmpElement = "@";
-						break;
-					}
-					if (tmpElement.equals("@")) {
-						map.set(j, tmpCh);
-						tmpElement = "@";
-						break;
-					}
-					if (tmpElement.equals("o")) {
-						map.set(j, tmpGo);
-						tmpElement = "@";
-						break;
-					}
-
-				}
-			}
-		}
 	}
 }

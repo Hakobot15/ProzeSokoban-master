@@ -50,13 +50,12 @@ public class LevelLoader {
      */
     private int mapHeight;
     /**
-     Zmienna skalujaca tekstury w poziomoe
+     * Zmienna skalujaca tekstury w poziomoe
      */
     /**
      * zmienne przechowujace polozenie gracza
      */
     private PlayerElement player;
-
 
 
     /**
@@ -152,8 +151,6 @@ public class LevelLoader {
         return mapHeight;
     }
 
-    public PlayerElement getPlayer() {
-        return player;
-    }
+    public PlayerElement getPlayer() { return player;   }
 }
 

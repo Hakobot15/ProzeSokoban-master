@@ -33,15 +33,17 @@ public class MainFrame extends JFrame {
 		setTitle(TITLE);
 		setVisible(true);
 		setBounds(new Rectangle(DEFAULT_WIDTH, DEFAULT_HIGHT));
+		newStatPanel();
 		makeMenu();
 		this.setResizable(true);
 		newGameStart();
 	}
+	private void newStatPanel(){add(new GameStatePanel("Ustawienia.txt", this));}
 	/**
 	 * uruchomienie nowej gry
 	 */
 	private void newGameStart() {
-		add(new GameAreaPanel("testLevel.txt", this));
+		add(new GameAreaPanel("testLevel.txt", this,DEFAULT_WIDTH,DEFAULT_HIGHT));
 	}
 	/**
 	 * Metoda tworzaca menu

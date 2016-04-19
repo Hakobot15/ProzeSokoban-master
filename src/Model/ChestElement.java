@@ -8,12 +8,15 @@ public class ChestElement extends AbstractElement {
      * Zmienna przechowujaca sciezke do grafiki skrzynki
      */
     private final static String SOURCE = "pic\\chest.png";
+    private final static String MARK = "$";
 
     /**
      * Konstruktor
      * @param x wspolzedna wyswietlenia grafiki
      * @param y wspolzedna wyswietlenia grafiki
-     */
+    */
+
+
     public ChestElement(int x, int y) {
         /**
          * konstruktor odwolujacy sie do nadklasy AbstractElement
@@ -32,7 +35,7 @@ public class ChestElement extends AbstractElement {
         ChestElement s = (ChestElement) obj;
         if(this.getX() == s.getX() && this.getY() == s.getX())
             return true;
-        return true;
+        return false;
     }
 
 }

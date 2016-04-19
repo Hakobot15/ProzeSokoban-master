@@ -9,6 +9,7 @@ public class WallElement extends AbstractElement {
      * Zmienna przechowujaca sciezke do grafiki skrzynki
      */
     private final static String SOURCE = "pic\\wall.png";
+    private final static String MARK = "#";
 
     /**
      * Konstrutor
@@ -33,7 +34,7 @@ public class WallElement extends AbstractElement {
         WallElement s = (WallElement) obj;
         if(this.getX() == s.getX() && this.getY() == s.getX())
             return true;
-            else return false;
+        return false;
     }
 
 }
