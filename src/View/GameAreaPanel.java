@@ -37,7 +37,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 * Zmienna skalujaca tekstury w pionie
 	 */
 	private double spaceY;
-
+	private String runingTime;
 	private int dx;
 	private int dy;
 	private boolean completed = false;
@@ -60,13 +60,14 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		map.addAll(level.getMap());
 		mapHeight = level.getMapHeight();
 		mapWidth = level.getMapWidth();
+		spaceX = width / mapWidth;
+		spaceY = (height-120) / mapHeight;
+		player = level.getPlayer();
+		wyswietlanieCzasu();
 		this.setLayout(null);
 		addComponentListener(this);
 		frame.addWindowStateListener(this);
 		frame.addKeyListener(this);
-		spaceX = width / mapWidth;
-		spaceY = (height-120) / mapHeight;
-		player = level.getPlayer();
 	}
 
 	/**
@@ -77,6 +78,9 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			AbstractElement item = (AbstractElement) map.get(i);
 			g.drawImage(item.getImage(), item.getX() * (int) spaceX, item.getY() * (int) spaceY, (int) spaceX, (int) spaceY, this);
 		}
+		g.setFont(new Font("TimesRoman", Font.PLAIN, 30));
+		g.setColor(Color.GREEN);
+		g.drawString(runingTime,200,200);
 	}
 
 	/**
@@ -166,4 +170,34 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 	public void keyTyped(KeyEvent e) {
 	}
+
+	private void wyswietlanieCzasu() {
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					int liczba=100;
+					while (liczba >= 0) {
+						if (liczba%2==0)
+							runingTime = "Out Of Time!";
+						else {
+							runingTime = "Time left: " + Integer.toString(liczba);
+						}
+						draw();
+						Thread.sleep(500);
+						liczba--;
+					}
+				} catch (InterruptedException exp) {
+					exp.printStackTrace();
+				}
+			}
+		});
+		t.start();
+	}
+	private void draw()
+	{
+		this.repaint();
+
+	}
+
 }
