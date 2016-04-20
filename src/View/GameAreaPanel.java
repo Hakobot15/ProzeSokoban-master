@@ -16,11 +16,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 * lista przechowujaca elemnty do wyswietlenia na mapie
 	 */
 	private ArrayList<AbstractElement> map = new ArrayList();
-	/**
-	 * zmiena przechowujaca gracza - potrzebna do ustalenia aktualnej pozycji gracza
-	 */
-	private PlayerElement player;
-	private String tmpElement = "@";
+
 	/**
 	 * zmienne przechowujace ilosc kolumn mapy
 	 */
@@ -37,8 +33,14 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 * Zmienna skalujaca tekstury w pionie
 	 */
 	private double spaceY;
-	private String runingTime;
+	private String runingTime; // potrzebne tylko do obslugi watku
+	/**
+	 * parametr przechowujacy chec zmiany polozenie gracz - w poziomie
+	 */
 	private int dx;
+	/**
+	 * parametr przechowujacy chec zmiany polozenie gracz - w pionie
+	 */
 	private int dy;
 	private boolean completed = false;
 
@@ -62,8 +64,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		mapWidth = level.getMapWidth();
 		spaceX = width / mapWidth;
 		spaceY = (height-120) / mapHeight;
-		player = level.getPlayer();
-		wyswietlanieCzasu();
+		wyswietlanieCzasu(); // to jest watek
 		this.setLayout(null);
 		addComponentListener(this);
 		frame.addWindowStateListener(this);
@@ -78,6 +79,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			AbstractElement item = (AbstractElement) map.get(i);
 			g.drawImage(item.getImage(), item.getX() * (int) spaceX, item.getY() * (int) spaceY, (int) spaceX, (int) spaceY, this);
 		}
+		// nizej odnosi sie do rysowania czasu w watku
 		g.setFont(new Font("TimesRoman", Font.PLAIN, 30));
 		g.setColor(Color.GREEN);
 		g.drawString(runingTime,200,200);
@@ -170,7 +172,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 	public void keyTyped(KeyEvent e) {
 	}
-
+// Watek
 	private void wyswietlanieCzasu() {
 		Thread t = new Thread(new Runnable() {
 			@Override
@@ -178,7 +180,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 				try {
 					int liczba=100;
 					while (liczba >= 0) {
-						if (liczba%2==0)
+						if (liczba == 0)
 							runingTime = "Out Of Time!";
 						else {
 							runingTime = "Time left: " + Integer.toString(liczba);
@@ -194,6 +196,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		});
 		t.start();
 	}
+	// potrzebne do rysowania
 	private void draw()
 	{
 		this.repaint();

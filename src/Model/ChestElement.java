@@ -24,7 +24,11 @@ public class ChestElement extends AbstractElement {
          */
         super(x, y, SOURCE);
     }
-    public boolean equals(Object obj)
+
+    /**
+     * Przeciazenie metody equals
+     */
+    public boolean equals(Object obj) // Kacper nie wiem czy to Ci sie przyda, ja tego nie wykorzystuje poki co
     {
         if (this == obj)
             return true;

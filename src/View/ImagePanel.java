@@ -7,13 +7,33 @@ import java.awt.*;
 import java.awt.event.*;
 
 class ImagePanel extends JPanel implements ComponentListener, WindowStateListener{
-
+    /**
+     * Zmienna przechowujaca nasze tlo(obraz)
+     */
     private Image img;
+    /**
+     * Zmienna sklaujac teksture obrazka w poziomie
+     */
     private int spaceX;
-    private JFrame frame;
+    /**
+     * Zmienna skalujaca teksture obrazka w pionie
+     */
     static int spaceY;
+    /**
+     * Jest to JPanel na ktorym bedziemy wywolywac malowanie, lisnery
+     */
+    private JFrame frame;
+    /**
+     * Zmienna przechowujaca aktualnie posiadane zycia
+     */
     private  String liczbaZyc;
+    /**
+     * Zmienna przechowujaca odczytany czas na mape
+     */
     private  int czasGry;
+    /**
+     * Zmienna przechowujaca pozostaly czas na wykonanie celow mapy
+     */
     private String runingTime;
 
     public ImagePanel(Image img, JFrame frame, String filename, int DX,int DY) {
@@ -74,7 +94,7 @@ private void wyswietlanieCzasu() {
      */
     public void componentResized(ComponentEvent e) {
         Rectangle r = getBounds();
-        spaceX = (int) r.width;
+        spaceX = r.width;
     }
     public void componentHidden(ComponentEvent e) {
     }

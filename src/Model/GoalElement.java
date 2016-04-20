@@ -22,6 +22,10 @@ public class GoalElement extends AbstractElement {
          */
         super(x, y, SOURCE);
     }
+
+    /**
+     * Przeciazenie metody equals
+     */
     public boolean equals(Object obj)
     {
         if (this == obj)

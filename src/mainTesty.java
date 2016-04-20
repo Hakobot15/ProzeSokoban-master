@@ -13,7 +13,7 @@ import java.util.Timer;
 public class mainTesty {
 
     public static void main(String[] args)
-    {
+    { // Zmienilem troche maina dziala bez zarzutu
             EventQueue.invokeLater(() -> {
                JFrame frame = new View.MainFrame();
                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
