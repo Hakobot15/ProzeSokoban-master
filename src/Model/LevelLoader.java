@@ -88,7 +88,7 @@ public class LevelLoader {
                 if (item == DEFAULT_PLAYER) // player
                 {
                     player = new PlayerElement(j, i - 1);
-                    map.add(new PlayerElement(j, i - 1));
+                    map.add(new FloorElement(j, i - 1));
 
                 }
                 /**

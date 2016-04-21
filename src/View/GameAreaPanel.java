@@ -49,6 +49,8 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 */
 	private JFrame frame;
 
+	PlayerElement player;
+
 	/**
 	 * Konstruktor
 	 *
@@ -60,6 +62,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		LevelLoader level;
 		level = new LevelLoader(fileName);
 		map.addAll(level.getMap());
+		player = level.getPlayer();
 		mapHeight = level.getMapHeight();
 		mapWidth = level.getMapWidth();
 		spaceX = width / mapWidth;
@@ -79,6 +82,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			AbstractElement item = (AbstractElement) map.get(i);
 			g.drawImage(item.getImage(), item.getX() * (int) spaceX, item.getY() * (int) spaceY, (int) spaceX, (int) spaceY, this);
 		}
+		g.drawImage(player.getImage(), player.getX()*(int) spaceX, player.getY() * (int) spaceY, (int) spaceX, (int) spaceY, this);
 		// nizej odnosi sie do rysowania czasu w watku
 		g.setFont(new Font("TimesRoman", Font.PLAIN, 30));
 		g.setColor(Color.GREEN);

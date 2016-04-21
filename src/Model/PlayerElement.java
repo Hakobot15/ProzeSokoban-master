@@ -8,7 +8,7 @@ public class PlayerElement extends AbstractElement {
     /**
      * Zmienna przechowujaca sciezke do grafiki skrzynki
      */
-    private final static String SOURCE = "pic\\player.png";
+    private final static String SOURCE = "pic\\player.gif";
     private final static String MARK = "@";
     /**
      * Konstruktor
