@@ -40,15 +40,15 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
         spaceX = DX;
         spaceY = DY;
         Settings ustawienia= new Settings(filename);
-        liczbaZyc =Integer.toString(ustawienia.getLives());
-        czasGry = ustawienia.getTimeScale();
+        liczbaZyc =Integer.toString(ustawienia.getLives()); // odczytuje z pliku ile mamy zyc
+        czasGry = ustawienia.getTimeScale(); // odcztuje czasu
         this.frame = frame;
         this.img = img;
-        setLayout(null);
+        setLayout(null); // w sumie to nie wiem co to jest xD
         addComponentListener(this);
         frame.addWindowStateListener(this);
         runingTime = Integer.toString(czasGry);
-        wyswietlanieCzasu();
+        wyswietlanieCzasu(); // wyswietla czas gry
     }
 private void wyswietlanieCzasu() {
     Thread t = new Thread(new Runnable() {
@@ -62,7 +62,7 @@ private void wyswietlanieCzasu() {
                         runingTime = "Time left: " + Integer.toString(czasGry);
                     }
                     draw();
-                    Thread.sleep(1000);
+                    Thread.sleep(1000); // timeout ustawiony na 1 sekunde
                     czasGry--;
                 }
             } catch (InterruptedException exp) {
@@ -73,7 +73,7 @@ private void wyswietlanieCzasu() {
     t.start();
 }
 
-    private void draw()
+    private void draw() // dodalem to bo wywolanie repaint w watku to trzeba sie za duzo jebac
     {
         this.repaint();
 

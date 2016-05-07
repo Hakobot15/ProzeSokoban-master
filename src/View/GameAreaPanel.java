@@ -166,7 +166,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 				return; // tak to pudelko wychodzimy z metody
 			else { // 1 pole to skrzynka 2 pole to pole neutralne
 				chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setXY(player.getX() + dx + dx, player.getY() + dy + dy); // ustawienie pozycji nowej skrzynki
-				player.setXY(player.getX() + dx, player.getY() + dy); // ustawienie nowej pozycji gracza
+				player.setXY(player.getX() + dx, player.getY() + dy); // ustawienie nowej pozycji gracza, nowa metoda ustawiajaca odrazu X i Y
 				draw(); // repaint
 				return; // ruszylismy sie to wychodzimy
 			}
@@ -181,7 +181,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		WallElement dupa = new WallElement(xw,yw);
 		for(int i = 0; i < walls.size();i++) // sprawdza czy nasz element to ktoras ze scian mapy
 		{
-			if(dupa.equals(walls.get(i)))
+			if(dupa.equals(walls.get(i))) // equals jest przeciazony
 			return true;
 		}
 		return false;
