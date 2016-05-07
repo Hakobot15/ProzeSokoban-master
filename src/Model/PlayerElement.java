@@ -35,7 +35,7 @@ public class PlayerElement extends AbstractElement {
         if(!(obj instanceof PlayerElement))
             return false;
         PlayerElement s = (PlayerElement) obj;
-        if(this.getX() == s.getX() && this.getY() == s.getX())
+        if(this.getX() == s.getX() && this.getY() == s.getY())
             return true;
         return false;
     }

@@ -43,7 +43,10 @@ public class LevelLoader {
     /**
      * Lista przechowujaca wszystkie elemnty na mapie
      */
-    private ArrayList<AbstractElement> map = new ArrayList<>();
+    private ArrayList<AbstractElement> map = new ArrayList<>(); // dodanie list przechowujacej elementy
+    private ArrayList<ChestElement> chests = new ArrayList<>(); // podstawa mapy sa floor, goal i wall
+    private ArrayList<GoalElement> goals = new ArrayList<>();// pozostale elementy: player i chest sa na niej przerysowane
+    private ArrayList<WallElement> walls = new ArrayList<>();
     private int mapWidth;
     /**
      * Zmienna przechowujac ilosc wierszy mapy
@@ -96,6 +99,7 @@ public class LevelLoader {
                  */
                 else if (item == DEFAULT_WALL)// wall
                 {
+                    walls.add(new WallElement(j, i - 1));
                     map.add(new WallElement(j, i - 1));
                 }
                 /**
@@ -103,7 +107,8 @@ public class LevelLoader {
                  */
                 else if (item == DEFAULT_CHEST) // box
                 {
-                    map.add(new ChestElement(j, i - 1));
+                    map.add(new FloorElement(j, i - 1));
+                    chests.add(new ChestElement(j,i-1));
                 }
                 /**
                  * Jezeli odczytany znak to o  zostanie dodanie cel do listy
@@ -111,6 +116,7 @@ public class LevelLoader {
                 else if (item == DEFAULT_GOAL) // goal-spot
                 {
                     map.add(new GoalElement(j, i - 1));
+                    goals.add(new GoalElement(j,i-1));
                 }
                 /**
                  * Jezeli odczytany znak to _  zostanie dodanie podlogi do listy
@@ -152,5 +158,9 @@ public class LevelLoader {
     }
 
     public PlayerElement getPlayer() { return player;   }
+
+    public ArrayList<ChestElement> getChests(){return chests;}
+    public ArrayList<GoalElement> getGoals () {return  goals;}
+    public ArrayList<WallElement> getWalls () {return walls;}
 }
 

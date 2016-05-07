@@ -7,7 +7,7 @@ public class ChestElement extends AbstractElement {
     /**
      * Zmienna przechowujaca sciezke do grafiki skrzynki
      */
-    private final static String SOURCE = "pic\\chest.png";
+    private final static String SOURCE = "pic\\chest.gif";
     private final static String MARK = "$";
 
     /**
@@ -37,7 +37,7 @@ public class ChestElement extends AbstractElement {
         if(!(obj instanceof ChestElement))
             return false;
         ChestElement s = (ChestElement) obj;
-        if(this.getX() == s.getX() && this.getY() == s.getX())
+        if(this.getX() == s.getX() && this.getY() == s.getY())
             return true;
         return false;
     }

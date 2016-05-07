@@ -35,7 +35,7 @@ public class GoalElement extends AbstractElement {
         if(!(obj instanceof GoalElement))
             return false;
         GoalElement s = (GoalElement) obj;
-        if(this.getX() == s.getX() && this.getY() == s.getX())
+        if(this.getX() == s.getX() && this.getY() == s.getY())
             return true;
         return false;
     }

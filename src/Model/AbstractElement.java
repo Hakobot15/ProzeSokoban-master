@@ -53,6 +53,7 @@ public class AbstractElement extends JComponent {
     public void setY(int y) {
         this.y = y;
     }
+    public void setXY(int x, int y) {this.x = x; this.y = y;} // jestem leniwy i robie to w 1 funkcji
 
     public int getX() {
         return x;

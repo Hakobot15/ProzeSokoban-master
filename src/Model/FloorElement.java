@@ -36,7 +36,7 @@ public class FloorElement extends AbstractElement {
         if(!(obj instanceof FloorElement))
             return false;
         FloorElement s = (FloorElement) obj;
-        if(this.getX() == s.getX() && this.getY() == s.getX())
+        if(this.getX() == s.getX() && this.getY() == s.getY())
             return true;
         return false;
     }
