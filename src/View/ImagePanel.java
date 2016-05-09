@@ -35,6 +35,7 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
      * Zmienna przechowujaca pozostaly czas na wykonanie celow mapy
      */
     private String runingTime;
+    int tmpCzas = 1;
 
     public ImagePanel(Image img, JFrame frame, String filename, int DX,int DY) {
         spaceX = DX;
@@ -62,8 +63,15 @@ private void wyswietlanieCzasu() {
                         runingTime = "Time left: " + Integer.toString(czasGry);
                     }
                     draw();
-                    Thread.sleep(1000); // timeout ustawiony na 1 sekunde
-                    czasGry--;
+                    if(tmpCzas % 6 == 0 ) // timeout na 1 sekunde
+                    {
+                        czasGry--;
+                        tmpCzas = 1;
+                    }
+                    else { tmpCzas++;}
+                    if() // Tutaj trzeba zrobic zeby srawdzalo czy jest level ukonczony
+                    Thread.sleep(20); //
+
                 }
             } catch (InterruptedException exp) {
                 exp.printStackTrace();

@@ -137,22 +137,18 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 		if (key == KeyEvent.VK_LEFT) {
 			dx = -1;
-			System.out.println("lewo");
 		}
 
 		if (key == KeyEvent.VK_RIGHT) {
 			dx = 1;
-			System.out.println("prawo");
 		}
 
 		if (key == KeyEvent.VK_UP) {
 			dy = -1;
-			System.out.println("gora");
 		}
 
 		if (key == KeyEvent.VK_DOWN) {
 			dy = 1;
-			System.out.println("dol");
 		}
 		move();
 	}
@@ -168,6 +164,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 				chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setXY(player.getX() + dx + dx, player.getY() + dy + dy); // ustawienie pozycji nowej skrzynki
 				player.setXY(player.getX() + dx, player.getY() + dy); // ustawienie nowej pozycji gracza, nowa metoda ustawiajaca odrazu X i Y
 				draw(); // repaint
+				check();
 				return; // ruszylismy sie to wychodzimy
 			}
 		}
@@ -175,6 +172,21 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		draw(); // repaint
 
 	}
+	public void check() {
+		int tmpCheck = 0;
+		for (int i = 0; i < chests.size(); i++) {
+			for (int j = 0; j < goals.size(); j++) {
+				if (chests.get(i).equalsXY(goals.get(j))) {
+					tmpCheck++;
+				}
+			}
+			if (tmpCheck == goals.size()) {
+				completed = true;
+				System.out.println("level ukonczony");
+			}
+		}
+	}
+
 	public boolean checkWall(int xw, int yw) // tutaj jest boolean bo tylko tyle nam trzeba
 	{
 		walls.size();

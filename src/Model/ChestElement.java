@@ -41,5 +41,11 @@ public class ChestElement extends AbstractElement {
             return true;
         return false;
     }
+    public boolean equalsXY(GoalElement obj)
+    {
+        if(this.getX() == obj.getX() && this.getY() == obj.getY())
+            return true;
+        else return false;
+    }
 
 }
