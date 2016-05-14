@@ -75,6 +75,8 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		addComponentListener(this);
 		frame.addWindowStateListener(this);
 		frame.addKeyListener(this);
+		frame.add(this);
+
 	}
 	/**
 	 * metoda rysujaca poziom
@@ -164,7 +166,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 				chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setXY(player.getX() + dx + dx, player.getY() + dy + dy); // ustawienie pozycji nowej skrzynki
 				player.setXY(player.getX() + dx, player.getY() + dy); // ustawienie nowej pozycji gracza, nowa metoda ustawiajaca odrazu X i Y
 				draw(); // repaint
-				check();
+				checkFinish();
 				return; // ruszylismy sie to wychodzimy
 			}
 		}
@@ -172,7 +174,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		draw(); // repaint
 
 	}
-	public void check() {
+	public void checkFinish() {
 		int tmpCheck = 0;
 		for (int i = 0; i < chests.size(); i++) {
 			for (int j = 0; j < goals.size(); j++) {
@@ -240,5 +242,10 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	}
 
 public double getMapTime(){	return mapTime;}
+public boolean getCompleted()
+{
+	return completed;
+}
+	public void setCompleted(){completed=true;}
 
 }

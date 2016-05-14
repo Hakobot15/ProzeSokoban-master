@@ -1,5 +1,6 @@
 package View;
 
+import Model.LevelLoader;
 import Model.Settings;
 
 import javax.swing.*;
@@ -35,46 +36,60 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
      * Zmienna przechowujaca pozostaly czas na wykonanie celow mapy
      */
     private String runingTime;
-    int tmpCzas = 1;
+    int counter = 1;
+    private boolean completed = false;
+    private boolean shutdown = false;
 
-    public ImagePanel(Image img, JFrame frame, String filename, int DX,int DY) {
+    public ImagePanel(Image img, JFrame frame, String filename, int DX,int DY, String tmp) {
+        LevelLoader level;
+        level = new LevelLoader(tmp);
         spaceX = DX;
         spaceY = DY;
         Settings ustawienia= new Settings(filename);
         liczbaZyc =Integer.toString(ustawienia.getLives()); // odczytuje z pliku ile mamy zyc
-        czasGry = ustawienia.getTimeScale(); // odcztuje czasu
+        czasGry = level.getTime(); // odcztuje czasu
         this.frame = frame;
         this.img = img;
         setLayout(null); // w sumie to nie wiem co to jest xD
         addComponentListener(this);
         frame.addWindowStateListener(this);
-        runingTime = Integer.toString(czasGry);
+        runingTime = Integer.toString(czasGry)+1;
         wyswietlanieCzasu(); // wyswietla czas gry
+        this.setPreferredSize(new Dimension(DX,DY)); // ustalanie wielkosc
+        frame.getContentPane().add(this,BorderLayout.NORTH); // ustalanie pozycji
     }
 private void wyswietlanieCzasu() {
     Thread t = new Thread(new Runnable() {
         @Override
         public void run() {
             try {
-                while (czasGry >= 0) {
-                    if (czasGry == 0)
+                while (czasGry >= 0 && !shutdown) {
+                    if(completed) {
+                    Thread.currentThread().interrupt();
+                    }
+                    if (czasGry == 0) {
                         runingTime = "Out Of Time!";
+                        completed = true;
+                    }
                     else {
                         runingTime = "Time left: " + Integer.toString(czasGry);
                     }
                     draw();
-                    if(tmpCzas % 6 == 0 ) // timeout na 1 sekunde
-                    {
-                        czasGry--;
-                        tmpCzas = 1;
-                    }
-                    else { tmpCzas++;}
-                    if() // Tutaj trzeba zrobic zeby srawdzalo czy jest level ukonczony
+                    //if() // Tutaj trzeba zrobic zeby srawdzalo czy jest level ukonczony
                     Thread.sleep(20); //
+                    if(counter%50==0) {
+                        czasGry--;
+                        counter++;
+                    }
+                    else counter++;
+                    if(Thread.currentThread().isAlive() == false)
+                    {
+                        shutdown=true;
+                    }
 
                 }
             } catch (InterruptedException exp) {
-                exp.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     });
@@ -130,4 +145,6 @@ private void wyswietlanieCzasu() {
         }
 
     }
+    public void setCompleted(){ completed = true;}
+    public boolean getCompleted(){return completed;}
 }

@@ -22,6 +22,7 @@ public class MainFrame extends JFrame {
 	 * Zmienna przechowujaca standardowa wysokosc okna gry
 	 */
 	private final static int DEFAULT_HIGHT = 570;
+	private String mapNames = "listaMap.txt";
 	private Action saveAction;
 	private Action newGameAction;
 	private GameAreaPanel areaPanel;
@@ -33,21 +34,24 @@ public class MainFrame extends JFrame {
 		setTitle(TITLE);
 		setVisible(true);
 		setBounds(new Rectangle(DEFAULT_WIDTH, DEFAULT_HIGHT));
-		newStatPanel(); // tutaj wyoluje statePanel
 		makeMenu();
 		this.setResizable(true);
 		newGameStart();
 	}
-	private void newStatPanel(){add(new GameStatePanel("Ustawienia.txt", this));}
+
+
 	/**
 	 * uruchomienie nowej gry
 	 */
 	// Do new Game doodalem this(potrzebny do wylapywania watku, i dodalem wysokosc i szerokosc, potrzebne do ustalanie wielkosc tekstur
 	private void newGameStart() {
-		add(new GameAreaPanel("testLevel.txt", this,DEFAULT_WIDTH,DEFAULT_HIGHT));
+			Thread t = new Thread(new MyRunnable(this, DEFAULT_WIDTH, DEFAULT_HIGHT, mapNames) {
+			});
+			t.start();
+
 	}
 	/**
-	 * Metoda tworzaca menu
+	 * Method creating mainMenu
 	 */
 	private void makeMenu() {
 		JMenuBar menuBar = new JMenuBar();
@@ -150,4 +154,5 @@ public class MainFrame extends JFrame {
 		this.setJMenuBar(menuBar);
 
 	}
+
 }
