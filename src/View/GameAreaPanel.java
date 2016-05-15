@@ -35,7 +35,6 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 * Zmienna skalujaca tekstury w pionie
 	 */
 	private double spaceY;
-	private String runingTime; // potrzebne tylko do obslugi watku
 	/**
 	 * parametr przechowujacy chec zmiany polozenie gracz - w poziomie
 	 */
@@ -44,13 +43,18 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 * parametr przechowujacy chec zmiany polozenie gracz - w pionie
 	 */
 	private int dy;
+	/**
+	 * Zmienna informujaca o ukonczeniu poziomu
+	 */
 	private boolean completed = false;
-	private double mapTime = 100 ;
 	/**
 	 * przekazane okno gry, sluzy do ustalenia rozmiaru aktualnego okna + oblsuga Eventu maxymalizowani i minimalizowaniu okna
 	 */
 	private JFrame frame;
-	PlayerElement player;
+	/**
+	 * Zmienna przechowujaca informacje o graczu
+	 */
+	private PlayerElement player;
 
 	/**
 	 * Konstruktor
@@ -62,7 +66,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		this.frame = frame;
 		LevelLoader level;
 		level = new LevelLoader(fileName);
-		map.addAll(level.getMap());  // dodanie list z level loader
+		map.addAll(level.getMap());
 		goals.addAll(level.getGoals());
 		chests.addAll(level.getChests());
 		walls.addAll(level.getWalls());
@@ -104,14 +108,11 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		spaceX = r.width / mapWidth;
 	}
 
-	public void componentHidden(ComponentEvent e) {
-	}
+	public void componentHidden(ComponentEvent e) {}
 
-	public void componentMoved(ComponentEvent e) {
-	}
+	public void componentMoved(ComponentEvent e) {}
 
-	public void componentShown(ComponentEvent e) {
-	}
+	public void componentShown(ComponentEvent e) {}
 
 	/**
 	 * Przeciazenie metody z WindowStateListner
@@ -154,6 +155,11 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		}
 		move();
 	}
+
+	/**
+	 * Metoda odpowiedziala za ruch po planszy
+	 * Jest wywolywana przez z keyPressed
+	 */
 	public void move() {
 		if (checkWall(player.getX() + dx, player.getY() + dy)) // sprawdzanie czy element na ktorych chcemy isc czy to nie sciana
 			return; // to sciana - wychodzimy z metody
@@ -165,15 +171,19 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			else { // 1 pole to skrzynka 2 pole to pole neutralne
 				chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setXY(player.getX() + dx + dx, player.getY() + dy + dy); // ustawienie pozycji nowej skrzynki
 				player.setXY(player.getX() + dx, player.getY() + dy); // ustawienie nowej pozycji gracza, nowa metoda ustawiajaca odrazu X i Y
-				draw(); // repaint
+				this.repaint();
 				checkFinish();
 				return; // ruszylismy sie to wychodzimy
 			}
 		}
-		player.setXY(player.getX() + dx, player.getY() + dy); // 1 pole to pole neutralne
-		draw(); // repaint
+		player.setXY(player.getX() + dx, player.getY() + dy);
+		this.repaint();
 
 	}
+
+	/**
+	 * Metoda sprawdzajaca czy warunki ukoczenia mapy sa spelnione
+	 */
 	public void checkFinish() {
 		int tmpCheck = 0;
 		for (int i = 0; i < chests.size(); i++) {
@@ -189,23 +199,36 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		}
 	}
 
-	public boolean checkWall(int xw, int yw) // tutaj jest boolean bo tylko tyle nam trzeba
+	/**
+	 *
+	 * @param dx chec poruszenia sie na osi ox
+	 * @param dy chec poruszenia sie na osi oy
+     * @return zwraca czy na drodze nie ma sciany
+     */
+	public boolean checkWall(int dx, int dy) // tutaj jest boolean bo tylko tyle nam trzeba
 	{
 		walls.size();
-		WallElement dupa = new WallElement(xw,yw);
+		WallElement tmp = new WallElement(dx,dy);
 		for(int i = 0; i < walls.size();i++) // sprawdza czy nasz element to ktoras ze scian mapy
 		{
-			if(dupa.equals(walls.get(i))) // equals jest przeciazony
+			if(tmp.equals(walls.get(i))) // equals jest przeciazony
 			return true;
 		}
 		return false;
 	}
-	public int checkChest(int xw, int yw ) // tutaj boolean nie wystarczy bo musimy wiedziec jeszcze ktora skrzyka jest na drodze
+
+	/**
+	 *
+	 * @param dx chec przesuniecia sie w osi ox
+	 * @param dy chec przesuniecia sie w osi oy
+     * @return zwraca polozenie skrzynki z Listy(jezeli zwraca wartosc ujemna oznacza to ze na drodze nie ma skrzynki)
+     */
+	public int checkChest(int dx, int dy ) // tutaj boolean nie wystarczy bo musimy wiedziec jeszcze ktora skrzyka jest na drodze
 	{
-		ChestElement dupa = new ChestElement(xw,yw);
+		ChestElement tmp = new ChestElement(dx,dy);
 		for(int i = 0; i < chests.size();i++)
 		{
-			if(dupa.equals(chests.get(i))) {
+			if(tmp.equals(chests.get(i))) {
 				return i; // zwraca pozycje skrzynki z list chests, musimy to wiedziec zeby moc zmodyfikowac ja podczas ruchu
 			}
 		}
@@ -234,14 +257,6 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 	public void keyTyped(KeyEvent e) {
 	}
-
-	// potrzebne do rysowania
-	private void draw() {
-		this.repaint();
-
-	}
-
-public double getMapTime(){	return mapTime;}
 public boolean getCompleted()
 {
 	return completed;

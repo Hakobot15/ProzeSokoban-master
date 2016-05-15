@@ -43,10 +43,22 @@ public class LevelLoader {
     /**
      * Lista przechowujaca wszystkie elemnty na mapie
      */
-    private ArrayList<AbstractElement> map = new ArrayList<>(); // dodanie list przechowujacej elementy
-    private ArrayList<ChestElement> chests = new ArrayList<>(); // podstawa mapy sa floor, goal i wall
-    private ArrayList<GoalElement> goals = new ArrayList<>();// pozostale elementy: player i chest sa na niej przerysowane
+    private ArrayList<AbstractElement> map = new ArrayList<>();
+    /**
+     * Lista przechowujaca Chest elementy
+     */
+    private ArrayList<ChestElement> chests = new ArrayList<>();
+    /**
+     * Lista przechowujaca Cele mapy
+     */
+    private ArrayList<GoalElement> goals = new ArrayList<>();
+    /**
+     * Lista przechowujaca sciany mapy
+     */
     private ArrayList<WallElement> walls = new ArrayList<>();
+    /**
+     * Zmienna przechowujaca ilosc kolun mapy
+     */
     private int mapWidth;
     /**
      * Zmienna przechowujac ilosc wierszy mapy
@@ -157,10 +169,28 @@ public class LevelLoader {
         return mapHeight;
     }
 
+    /**
+     *
+     * @return Zwraca polozenia gracza na mapie
+     */
     public PlayerElement getPlayer() { return player;   }
 
+    /**
+     *
+     * @return Zwraca liste skryn na mapie
+     */
     public ArrayList<ChestElement> getChests(){return chests;}
+
+    /**
+     *
+     * @return Zwraca liste celów mapy
+     */
     public ArrayList<GoalElement> getGoals () {return  goals;}
+
+    /**
+     *
+     * @return Zwraca list scian na mapie
+     */
     public ArrayList<WallElement> getWalls () {return walls;}
 }
 

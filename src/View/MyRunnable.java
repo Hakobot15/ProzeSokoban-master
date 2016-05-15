@@ -1,5 +1,7 @@
 package View;
 
+import Model.Settings;
+
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,29 +11,68 @@ import java.io.IOException;
  * Created by DDcreo on 2016-05-14.
  */
 public class MyRunnable implements Runnable {
+    /**
+     * Zmienna przechowujaca panel gry
+     */
     private GameAreaPanel tmpCurrentArea;
+    /**
+     * Zmienna przechowujaca panel wynikow
+     */
     private GameStatePanel tmpCurrentState;
+    /**
+     * Zmienna potrzebna do odczytywania listy map
+     */
     private BufferedReader tmpReader;
-    private JFrame Main;
-    String tmp = null;
+    /**
+     * zmiennap przechowujaca ekran gry
+     */
+    private JFrame frame;
+    /**
+     * Zmienna przechowujaca odczytany w danej chwili nazwe mapy
+     */
+    private String tmp = null;
+    /**
+     * Zmienne przechowujaca standardowe wymiary mapy
+     */
     private int DEFAULT_WIDTH;
     private int DEFAULT_HIGHT;
+    /**
+     * Zmienna przechowujaca nazwe pliku w ktorym sa nazwy mapy
+     */
     private String mapNames;
+    /**
+     * Zmienna informujaca ktora to mapa
+     */
     private int licznik = 0;
-    private int a = 1;
-    private String ustawienia = "Ustawienia.txt";
+    /**
+     * Zmienna przechowujaca aktualny wynik
+     */
+    private int score = 0;
+    /**
+     * Zmienna przechowujaca ilosc zyc jakie nam pozostaly
+     */
+    private int liczbaZyc;
+    /**
+     * Przeliczniki do punktacji
+     */
+    private int przelicznikCzasu;
+    private int przelicznikPunktow;
 
-    public MyRunnable(JFrame Main, int DEFAULT_WIDTH, int DEFAULT_HIGHT, String mapNames)
+    public MyRunnable(JFrame frame, int DEFAULT_WIDTH, int DEFAULT_HIGHT, String mapNames)
     {
         this.mapNames = mapNames;
-        this.Main = Main;
+        this.frame = frame;
         this.DEFAULT_HIGHT = DEFAULT_HIGHT;
         this.DEFAULT_WIDTH = DEFAULT_WIDTH;
+        Settings ustawienia= new Settings("Ustawienia.txt");
+        liczbaZyc = ustawienia.getLives(); // odczytuje z pliku ile mamy zyc
+        przelicznikCzasu = ustawienia.getTimeScale();
+        przelicznikPunktow = ustawienia.getPointScale();
         try {
             tmpReader = new BufferedReader(new FileReader(mapNames));
             if ((tmp = tmpReader.readLine()) != null) {
-                tmpCurrentState = new GameStatePanel(ustawienia, Main, tmp);
-                tmpCurrentArea = new GameAreaPanel(tmp, Main, DEFAULT_WIDTH, DEFAULT_HIGHT);
+                tmpCurrentState = new GameStatePanel(frame, tmp, liczbaZyc);
+                tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
             } else return;
         } catch (IOException ex)
         {
@@ -47,21 +88,32 @@ public class MyRunnable implements Runnable {
     }
     public void run() {
         try {
-            while(a>0) {
+            while(Thread.currentThread().isAlive()) {
+
                 if (tmpCurrentArea.getCompleted() == true) {
                     wywolanieMapy();
                 }
-                if(tmpCurrentState.panel.getCompleted())
+                if(tmpCurrentState.getPanel().getCompleted())
                 {
+                    liczbaZyc--;
+                    if(liczbaZyc<0) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+
                     rebootMapy();
                 }
                 Thread.sleep(20);
             }
         } catch (InterruptedException exp) {
-            exp.printStackTrace();
+            Thread.currentThread().interrupt();
         }
 
     }
+
+    /**
+     * Ponownie wczytanie tego samego poziomu
+     */
     public void rebootMapy()
     {
         try {
@@ -71,14 +123,14 @@ public class MyRunnable implements Runnable {
                 tmpReader.readLine();
             }
             if ((tmp = tmpReader.readLine()) != null ) {
-                Main.remove(tmpCurrentArea);
-                Main.revalidate();
-                Main.remove(tmpCurrentState.panel);
-                Main.revalidate();
-                tmpCurrentState = new GameStatePanel(ustawienia, Main, tmp);
-                Main.revalidate();
-                tmpCurrentArea = new GameAreaPanel(tmp, Main, DEFAULT_WIDTH, DEFAULT_HIGHT);
-                Main.revalidate();
+                frame.remove(tmpCurrentArea);
+                frame.revalidate();
+                frame.remove(tmpCurrentState.getPanel());
+                frame.revalidate();
+                tmpCurrentState = new GameStatePanel( frame, tmp, liczbaZyc);
+                frame.revalidate();
+                tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
+                frame.revalidate();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,7 +142,12 @@ public class MyRunnable implements Runnable {
             }
         }
     }
+
+    /**
+     * Wczytanie nowego poziomu mapy
+     */
     public void wywolanieMapy() {
+       // score += tmpCurrentState.panel.getCzasGry()*tmpCurrentArea.get;
         try {
             tmpReader = new BufferedReader(new FileReader(mapNames));
             for (int i = 0; i<=licznik;i++)
@@ -98,13 +155,13 @@ public class MyRunnable implements Runnable {
                 tmpReader.readLine();
             }
             if ((tmp = tmpReader.readLine()) != null ) {
-                tmpCurrentState.panel.setCompleted();
+                tmpCurrentState.getPanel().setCompleted();
                 licznik++;
-                Main.remove(tmpCurrentArea);
-                Main.remove(tmpCurrentState);
-                tmpCurrentState = new GameStatePanel(ustawienia, Main, tmp);
-                tmpCurrentArea = new GameAreaPanel(tmp, Main, DEFAULT_WIDTH, DEFAULT_HIGHT);
-                Main.revalidate();
+                frame.remove(tmpCurrentArea);
+                frame.remove(tmpCurrentState);
+                tmpCurrentState = new GameStatePanel(frame, tmp, liczbaZyc);
+                tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
+                frame.revalidate();
             }
         } catch (IOException e) {
             e.printStackTrace();

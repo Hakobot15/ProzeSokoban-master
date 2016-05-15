@@ -1,7 +1,7 @@
 package View;
 
 import Model.LevelLoader;
-import Model.Settings;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +19,7 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
     /**
      * Zmienna skalujaca teksture obrazka w pionie
      */
-    static int spaceY;
+    private int spaceY;
     /**
      * Jest to JPanel na ktorym bedziemy wywolywac malowanie, lisnery
      */
@@ -36,21 +36,26 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
      * Zmienna przechowujaca pozostaly czas na wykonanie celow mapy
      */
     private String runingTime;
-    int counter = 1;
+    /**
+     * zmienna potrzebna do odliczania czasu;
+     */
+    private int counter = 1;
+    /**
+     * Zmienna przechowujaca warunek skonczenia planszy
+     */
     private boolean completed = false;
-    private boolean shutdown = false;
 
-    public ImagePanel(Image img, JFrame frame, String filename, int DX,int DY, String tmp) {
+
+    public ImagePanel(Image img, JFrame frame, int DX,int DY, String tmp, int liczbaZyc) {
+        this.liczbaZyc = Integer.toString(liczbaZyc);
         LevelLoader level;
         level = new LevelLoader(tmp);
+        czasGry = level.getTime();
         spaceX = DX;
         spaceY = DY;
-        Settings ustawienia= new Settings(filename);
-        liczbaZyc =Integer.toString(ustawienia.getLives()); // odczytuje z pliku ile mamy zyc
-        czasGry = level.getTime(); // odcztuje czasu
         this.frame = frame;
         this.img = img;
-        setLayout(null); // w sumie to nie wiem co to jest xD
+        setLayout(null);
         addComponentListener(this);
         frame.addWindowStateListener(this);
         runingTime = Integer.toString(czasGry)+1;
@@ -58,12 +63,16 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
         this.setPreferredSize(new Dimension(DX,DY)); // ustalanie wielkosc
         frame.getContentPane().add(this,BorderLayout.NORTH); // ustalanie pozycji
     }
-private void wyswietlanieCzasu() {
+
+    /**
+     * Wątek który odlicza czas i go wyświetla
+     */
+    private void wyswietlanieCzasu() {
     Thread t = new Thread(new Runnable() {
         @Override
         public void run() {
             try {
-                while (czasGry >= 0 && !shutdown) {
+                while (czasGry >= 0) {
                     if(completed) {
                     Thread.currentThread().interrupt();
                     }
@@ -74,19 +83,13 @@ private void wyswietlanieCzasu() {
                     else {
                         runingTime = "Time left: " + Integer.toString(czasGry);
                     }
-                    draw();
-                    //if() // Tutaj trzeba zrobic zeby srawdzalo czy jest level ukonczony
-                    Thread.sleep(20); //
+                    frame.repaint();
+                    Thread.sleep(20);
                     if(counter%50==0) {
                         czasGry--;
                         counter++;
                     }
                     else counter++;
-                    if(Thread.currentThread().isAlive() == false)
-                    {
-                        shutdown=true;
-                    }
-
                 }
             } catch (InterruptedException exp) {
                 Thread.currentThread().interrupt();
@@ -96,11 +99,6 @@ private void wyswietlanieCzasu() {
     t.start();
 }
 
-    private void draw() // dodalem to bo wywolanie repaint w watku to trzeba sie za duzo jebac
-    {
-        this.repaint();
-
-    }
 
     public void paintComponent(Graphics g) {
 
@@ -145,6 +143,15 @@ private void wyswietlanieCzasu() {
         }
 
     }
+
+    /**
+     * metoda ustalajaca status ukonczenia mapy
+     */
     public void setCompleted(){ completed = true;}
+
+    /**
+     *
+     * @return zwraca status ukonczenia mapy
+     */
     public boolean getCompleted(){return completed;}
 }

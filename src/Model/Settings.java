@@ -105,7 +105,7 @@ public class Settings {
         /**
          * Sprawdzenie czy przypisane wartosc sa logiczne
          */
-        if (lives <= 0)
+        if (lives < 0)
             lives = 3;
         if (pointScale < 1)
             pointScale = 2;

@@ -41,6 +41,12 @@ public class ChestElement extends AbstractElement {
             return true;
         return false;
     }
+
+    /**
+     *
+     * @param obj obiekt ktory porównujemy
+     * @return wzraca czy dane obiekty maja maja te same wspolrzedne
+     */
     public boolean equalsXY(GoalElement obj)
     {
         if(this.getX() == obj.getX() && this.getY() == obj.getY())
