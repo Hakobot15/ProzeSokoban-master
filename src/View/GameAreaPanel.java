@@ -55,7 +55,12 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	 * Zmienna przechowujaca informacje o graczu
 	 */
 	private PlayerElement player;
-
+	/**
+	 * Flaga potrzebna do animacji ruchu
+	 */
+	private boolean canMove = true;
+	private int moveX = 0;
+	private int moveY = 0;
 	/**
 	 * Konstruktor
 	 *
@@ -92,10 +97,10 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		}
 		for (int j = 0; j<chests.size();j++)
 		{
-			AbstractElement item2 = (AbstractElement) chests.get(j);
-			g.drawImage(item2.getImage(), item2.getX()* (int) spaceX, item2.getY()*(int) spaceY, (int) spaceX, (int) (spaceY), this);
+			ChestElement item2 = (ChestElement) chests.get(j);
+			g.drawImage(item2.getImage(), item2.getX()* (int) spaceX+item2.getMoveX(), item2.getY()*(int) spaceY+item2.getMoveY(), (int) spaceX, (int) (spaceY), this);
 		}
-		g.drawImage(player.getImage(), player.getX()*(int) spaceX, player.getY() * (int) spaceY, (int) spaceX, (int) spaceY, this);
+			g.drawImage(player.getImage(), player.getX() * (int) spaceX + moveX, player.getY() * (int) spaceY + moveY, (int) spaceX, (int) spaceY, this);
 	}
 
 	/**
@@ -136,6 +141,8 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 	public void keyPressed(KeyEvent e) { // w tej metodzie bedziemy wykonywac ruch, bo jest najlatwiej
 
+		if(!canMove)
+			return;
 		int key = e.getKeyCode();
 
 		if (key == KeyEvent.VK_LEFT) {
@@ -169,18 +176,74 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			else if (checkChest(player.getX() + dx + dx, player.getY() + dy + dy) >= 0) // sprawdzenie czy drugi element to pudelko
 				return; // tak to pudelko wychodzimy z metody
 			else { // 1 pole to skrzynka 2 pole to pole neutralne
-				chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setXY(player.getX() + dx + dx, player.getY() + dy + dy); // ustawienie pozycji nowej skrzynki
-				player.setXY(player.getX() + dx, player.getY() + dy); // ustawienie nowej pozycji gracza, nowa metoda ustawiajaca odrazu X i Y
-				this.repaint();
-				checkFinish();
+				animacjaGraczaSkrzynki(dx,dy);
 				return; // ruszylismy sie to wychodzimy
 			}
 		}
-		player.setXY(player.getX() + dx, player.getY() + dy);
-		this.repaint();
+		animacjaGracza(dx,dy);
 
 	}
 
+	public void animacjaGraczaSkrzynki(int dx, int dy){
+		canMove = false;
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					while(!canMove & !completed) {
+						for (int i = 1; i < 50; i++) {
+							moveX = (int) spaceX * dx * i / 50;
+							moveY = (int) spaceY * dy * i / 50;
+							chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setMoveX(moveX);
+							chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setMoveY(moveY);
+							frame.repaint();
+							Thread.sleep(5);
+						}
+						moveX = 0;
+						moveY = 0;
+						chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setMoveX(moveX);
+						chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setMoveY(moveY);
+						canMove = true;
+						chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setXY(player.getX() + dx + dx, player.getY() + dy + dy); // ustawienie pozycji nowej skrzynki
+						player.setXY(player.getX() + dx, player.getY() + dy); // ustawienie nowej pozycji gracza, nowa metoda ustawiajaca odrazu X i Y
+						checkFinish();
+
+					}
+				} catch (Exception exp) {
+					exp.printStackTrace();
+				}
+			}
+		});
+		t.start();
+	}
+	/**
+	 * Metoda odpowiedzialna za animacje gracza
+	 */
+	public void animacjaGracza(int dx, int dy) {
+		canMove = false;
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					while(!canMove & !completed) {
+						for (int i = 1; i < 50; i++) {
+							moveX = (int) spaceX * dx * i / 50;
+							moveY = (int) spaceY * dy * i / 50;
+							frame.repaint();
+							Thread.sleep(5);
+						}
+						moveX = 0;
+						moveY = 0;
+						canMove = true;
+						player.setXY(player.getX() + dx, player.getY() + dy);
+					}
+				} catch (Exception exp) {
+					exp.printStackTrace();
+				}
+			}
+		});
+		t.start();
+			}
 	/**
 	 * Metoda sprawdzajaca czy warunki ukoczenia mapy sa spelnione
 	 */

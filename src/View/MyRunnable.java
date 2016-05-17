@@ -58,6 +58,8 @@ public class MyRunnable implements Runnable {
     private int przelicznikCzasu;
     private int przelicznikPunktow;
 
+    private boolean shutdown = false;
+
     public MyRunnable(JFrame frame, int DEFAULT_WIDTH, int DEFAULT_HIGHT, String mapNames)
     {
         this.mapNames = mapNames;
@@ -88,7 +90,7 @@ public class MyRunnable implements Runnable {
     }
     public void run() {
         try {
-            while(Thread.currentThread().isAlive()) {
+            while(!shutdown) {
 
                 if (tmpCurrentArea.getCompleted() == true) {
                     wywolanieMapy();
@@ -97,6 +99,8 @@ public class MyRunnable implements Runnable {
                 {
                     liczbaZyc--;
                     if(liczbaZyc<0) {
+                        shutdown = true;
+                        tmpCurrentArea.setCompleted();
                         Thread.currentThread().interrupt();
                         return;
                     }
@@ -158,8 +162,11 @@ public class MyRunnable implements Runnable {
                 tmpCurrentState.getPanel().setCompleted();
                 licznik++;
                 frame.remove(tmpCurrentArea);
-                frame.remove(tmpCurrentState);
-                tmpCurrentState = new GameStatePanel(frame, tmp, liczbaZyc);
+                frame.revalidate();
+                frame.remove(tmpCurrentState.getPanel());
+                frame.revalidate();
+                tmpCurrentState = new GameStatePanel( frame, tmp, liczbaZyc);
+                frame.revalidate();
                 tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
                 frame.revalidate();
             }

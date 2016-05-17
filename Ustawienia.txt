@@ -1,4 +1,4 @@
-lives0
+lives2
 czas100
 punkty777
 cosktos

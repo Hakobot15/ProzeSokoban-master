@@ -9,6 +9,8 @@ public class ChestElement extends AbstractElement {
      */
     private final static String SOURCE = "pic\\chest.gif";
     private final static String MARK = "$";
+    private int moveX = 0;
+    private int moveY =0;
 
     /**
      * Konstruktor
@@ -54,4 +56,14 @@ public class ChestElement extends AbstractElement {
         else return false;
     }
 
+    public void setMoveX(int moveX){
+        this.moveX = moveX;
+    }
+    public void setMoveY(int moveY)
+    {
+        this.moveY = moveY;
+    }
+
+    public int getMoveX(){return moveX;}
+    public int getMoveY(){return moveY;}
 }
