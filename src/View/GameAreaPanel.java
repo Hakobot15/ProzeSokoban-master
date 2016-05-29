@@ -147,20 +147,28 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 		if (key == KeyEvent.VK_LEFT) {
 			dx = -1;
+			move();
+			return;
 		}
 
 		if (key == KeyEvent.VK_RIGHT) {
 			dx = 1;
+			move();
+			return;
 		}
 
 		if (key == KeyEvent.VK_UP) {
 			dy = -1;
+			move();
+			return;
 		}
 
 		if (key == KeyEvent.VK_DOWN) {
 			dy = 1;
+			move();
+			return;
 		}
-		move();
+
 	}
 
 	/**

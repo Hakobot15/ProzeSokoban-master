@@ -75,6 +75,9 @@ public class MyRunnable implements Runnable {
             if ((tmp = tmpReader.readLine()) != null) {
                 tmpCurrentState = new GameStatePanel(frame, tmp, liczbaZyc);
                 tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
+                tmpCurrentArea.repaint();
+                tmpCurrentState.getPanel().repaint();
+                frame.revalidate();
             } else return;
         } catch (IOException ex)
         {
