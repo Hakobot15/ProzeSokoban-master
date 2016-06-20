@@ -4,6 +4,10 @@ import Model.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import javax.swing.*;
 
@@ -50,7 +54,7 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	/**
 	 * przekazane okno gry, sluzy do ustalenia rozmiaru aktualnego okna + oblsuga Eventu maxymalizowani i minimalizowaniu okna
 	 */
-	private JFrame frame;
+	private MainFrame frame;
 	/**
 	 * Zmienna przechowujaca informacje o graczu
 	 */
@@ -61,16 +65,29 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	private boolean canMove = true;
 	private int moveX = 0;
 	private int moveY = 0;
+	private int bonusMax = 0;
+	private int bonusMin = 0;
+	private int time;
+	private ArrayList<Integer> timeSpawn = new ArrayList<>();
+	private ArrayList<FloorElement> floors = new ArrayList<>();
+	private BonusElement bonno = null;
+	private boolean flagBonus = false;
+ 	private ImagePanel tmpState;
 	/**
 	 * Konstruktor
 	 *
 	 * @param fileName sciezka dostepu do pliku z poziomem gry
 	 * @parm frame przekazuje okna aby mozna bylo obsluzyc event oraz do obliczen zbalansowania tekstur
 	 */
-	public GameAreaPanel(String fileName, JFrame frame, int width, int height) {
+	public GameAreaPanel(String fileName, MainFrame frame, int width, int height) {
 		this.frame = frame;
+		Settings tmpSett = new Settings("Ustawienia.txt");
 		LevelLoader level;
 		level = new LevelLoader(fileName);
+		floors.addAll(level.getFloors());
+		if(!frame.isStatus()) {
+			time = level.getTime()*tmpSett.getTimeScale();
+		} else {time = level.getTime();}
 		map.addAll(level.getMap());
 		goals.addAll(level.getGoals());
 		chests.addAll(level.getChests());
@@ -79,14 +96,53 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		mapHeight = level.getMapHeight();
 		mapWidth = level.getMapWidth();
 		spaceX = width / mapWidth;
-		spaceY = (height-120) / mapHeight;
+		spaceY = (height - 120) / mapHeight;
+		getBonus();
 		this.setLayout(null);
+		this.addKeyListener(this);
 		addComponentListener(this);
 		frame.addWindowStateListener(this);
 		frame.addKeyListener(this);
 		frame.add(this);
 
 	}
+
+	public void getBonus() {
+		String fileName = "Ustawienia.txt";
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(fileName));
+			String tmp = null;
+			while ((tmp = reader.readLine()) != null) {
+				if (tmp.startsWith("bonuspktmax")) {
+					bonusMax = Integer.parseInt(tmp.substring("bonuspktmax".length()));
+				}
+				if (tmp.startsWith("bonuspktmin")) {
+					bonusMin = Integer.parseInt(tmp.substring("bonuspktmin".length()));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if (bonusMax < bonusMin) {
+			int tmp;
+			tmp = bonusMax;
+			bonusMax = bonusMin;
+			bonusMin = tmp;
+		}
+		Random rand = new Random();
+		int randomNum = rand.nextInt((bonusMax - bonusMin) + 1) + bonusMin;
+		for (int i = 0; i < randomNum; i++) {
+			timeSpawn.add(rand.nextInt(time-5)+5);
+		}
+	}
+
 	/**
 	 * metoda rysujaca poziom
 	 */
@@ -95,12 +151,13 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			AbstractElement item = (AbstractElement) map.get(i);
 			g.drawImage(item.getImage(), item.getX() * (int) spaceX, item.getY() * (int) spaceY, (int) spaceX, (int) spaceY, this);
 		}
-		for (int j = 0; j<chests.size();j++)
-		{
+		for (int j = 0; j < chests.size(); j++) {
 			ChestElement item2 = (ChestElement) chests.get(j);
-			g.drawImage(item2.getImage(), item2.getX()* (int) spaceX+item2.getMoveX(), item2.getY()*(int) spaceY+item2.getMoveY(), (int) spaceX, (int) (spaceY), this);
+			g.drawImage(item2.getImage(), item2.getX() * (int) spaceX + item2.getMoveX(), item2.getY() * (int) spaceY + item2.getMoveY(), (int) spaceX, (int) (spaceY), this);
 		}
-			g.drawImage(player.getImage(), player.getX() * (int) spaceX + moveX, player.getY() * (int) spaceY + moveY, (int) spaceX, (int) spaceY, this);
+		g.drawImage(player.getImage(), player.getX() * (int) spaceX + moveX, player.getY() * (int) spaceY + moveY, (int) spaceX, (int) spaceY, this);
+		if(flagBonus)
+		g.drawImage(bonno.getImage(), bonno.getX() * (int) spaceX, bonno.getY()*(int)spaceY, (int) spaceX, (int) spaceY, this);
 	}
 
 	/**
@@ -113,11 +170,14 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		spaceX = r.width / mapWidth;
 	}
 
-	public void componentHidden(ComponentEvent e) {}
+	public void componentHidden(ComponentEvent e) {
+	}
 
-	public void componentMoved(ComponentEvent e) {}
+	public void componentMoved(ComponentEvent e) {
+	}
 
-	public void componentShown(ComponentEvent e) {}
+	public void componentShown(ComponentEvent e) {
+	}
 
 	/**
 	 * Przeciazenie metody z WindowStateListner
@@ -139,9 +199,8 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 	}
 
-	public void keyPressed(KeyEvent e) { // w tej metodzie bedziemy wykonywac ruch, bo jest najlatwiej
-
-		if(!canMove)
+	public void keyPressed(KeyEvent e) { // w tej metodzie bedziemy wykonywac ruch, bo jest najlatwiej\/
+		if (!canMove)
 			return;
 		int key = e.getKeyCode();
 
@@ -184,28 +243,29 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			else if (checkChest(player.getX() + dx + dx, player.getY() + dy + dy) >= 0) // sprawdzenie czy drugi element to pudelko
 				return; // tak to pudelko wychodzimy z metody
 			else { // 1 pole to skrzynka 2 pole to pole neutralne
-				animacjaGraczaSkrzynki(dx,dy);
+				animacjaGraczaSkrzynki(dx, dy);
 				return; // ruszylismy sie to wychodzimy
 			}
 		}
-		animacjaGracza(dx,dy);
+		animacjaGracza(dx, dy);
 
 	}
 
-	public void animacjaGraczaSkrzynki(int dx, int dy){
+	public void animacjaGraczaSkrzynki(int dx, int dy) {
 		canMove = false;
+		System.out.println("Pl: "+player.getX()+"  "+player.getY());
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					while(!canMove & !completed) {
+					while (!canMove & !completed) {
 						for (int i = 1; i < 50; i++) {
 							moveX = (int) spaceX * dx * i / 50;
 							moveY = (int) spaceY * dy * i / 50;
 							chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setMoveX(moveX);
 							chests.get(checkChest(player.getX() + dx, player.getY() + dy)).setMoveY(moveY);
 							frame.repaint();
-							Thread.sleep(5);
+							Thread.sleep(10);
 						}
 						moveX = 0;
 						moveY = 0;
@@ -224,16 +284,18 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 		});
 		t.start();
 	}
+
 	/**
 	 * Metoda odpowiedzialna za animacje gracza
 	 */
 	public void animacjaGracza(int dx, int dy) {
 		canMove = false;
+		System.out.println("Pl: "+player.getX()+"  "+player.getY());
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					while(!canMove & !completed) {
+					while (!canMove & !completed) {
 						for (int i = 1; i < 50; i++) {
 							moveX = (int) spaceX * dx * i / 50;
 							moveY = (int) spaceY * dy * i / 50;
@@ -251,7 +313,8 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 			}
 		});
 		t.start();
-			}
+	}
+
 	/**
 	 * Metoda sprawdzajaca czy warunki ukoczenia mapy sa spelnione
 	 */
@@ -271,40 +334,38 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 	}
 
 	/**
-	 *
 	 * @param dx chec poruszenia sie na osi ox
 	 * @param dy chec poruszenia sie na osi oy
-     * @return zwraca czy na drodze nie ma sciany
-     */
+	 * @return zwraca czy na drodze nie ma sciany
+	 */
 	public boolean checkWall(int dx, int dy) // tutaj jest boolean bo tylko tyle nam trzeba
 	{
 		walls.size();
-		WallElement tmp = new WallElement(dx,dy);
-		for(int i = 0; i < walls.size();i++) // sprawdza czy nasz element to ktoras ze scian mapy
+		WallElement tmp = new WallElement(dx, dy);
+		for (int i = 0; i < walls.size(); i++) // sprawdza czy nasz element to ktoras ze scian mapy
 		{
-			if(tmp.equals(walls.get(i))) // equals jest przeciazony
-			return true;
+			if (tmp.equals(walls.get(i))) // equals jest przeciazony
+				return true;
 		}
 		return false;
 	}
 
 	/**
-	 *
 	 * @param dx chec przesuniecia sie w osi ox
 	 * @param dy chec przesuniecia sie w osi oy
-     * @return zwraca polozenie skrzynki z Listy(jezeli zwraca wartosc ujemna oznacza to ze na drodze nie ma skrzynki)
-     */
-	public int checkChest(int dx, int dy ) // tutaj boolean nie wystarczy bo musimy wiedziec jeszcze ktora skrzyka jest na drodze
+	 * @return zwraca polozenie skrzynki z Listy(jezeli zwraca wartosc ujemna oznacza to ze na drodze nie ma skrzynki)
+	 */
+	public int checkChest(int dx, int dy) // tutaj boolean nie wystarczy bo musimy wiedziec jeszcze ktora skrzyka jest na drodze
 	{
-		ChestElement tmp = new ChestElement(dx,dy);
-		for(int i = 0; i < chests.size();i++)
-		{
-			if(tmp.equals(chests.get(i))) {
+		ChestElement tmp = new ChestElement(dx, dy);
+		for (int i = 0; i < chests.size(); i++) {
+			if (tmp.equals(chests.get(i))) {
 				return i; // zwraca pozycje skrzynki z list chests, musimy to wiedziec zeby moc zmodyfikowac ja podczas ruchu
 			}
 		}
 		return -1;
 	}
+
 	public void keyReleased(KeyEvent e) {
 
 		int key = e.getKeyCode();
@@ -328,10 +389,66 @@ public class GameAreaPanel extends JPanel implements ComponentListener, WindowSt
 
 	public void keyTyped(KeyEvent e) {
 	}
-public boolean getCompleted()
-{
-	return completed;
-}
-	public void setCompleted(){completed=true;}
 
+	public boolean getCompleted() {
+		return completed;
+	}
+
+	public void setCompleted() {
+		completed = true;
+	}
+
+	public ArrayList<Integer> getTimeSpawn() {
+		return timeSpawn;
+	}
+
+	public void spawnBonus(ImagePanel tmp) {
+		if(!flagBonus) {
+			System.out.println("jestem tutaj");
+			tmpState = tmp;
+			Random rand = new Random();
+			int spawn = rand.nextInt(floors.size() - 1);
+			int bonusX = floors.get(spawn).getX();
+			int bonusY = floors.get(spawn).getY();
+			bonno = new BonusElement(bonusX, bonusY);
+			flagBonus = true;
+			frame.repaint();
+			frame.revalidate();
+			spawnClock(bonusX,bonusY);
+			System.out.println("Bonus X i Y:"+bonusX+"  " +bonusY);
+		}
+	}
+
+	public void spawnClock(int bonusX, int bonusY) {
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					int i = 200;
+					while(flagBonus)
+					{
+						if(bonno.equalsXY(player))
+						{
+							i=0;
+							bonno = null;
+							flagBonus = false;
+							frame.repaint();
+							revalidate();
+							tmpState.setBonusPoints();
+
+						}
+						if(i==0){
+							flagBonus=false;
+						}
+						Thread.sleep(20);
+						i--;
+					}
+					flagBonus = false;
+
+				} catch (Exception ex) {
+				}
+			}
+		});
+		t.start();
+	}
 }

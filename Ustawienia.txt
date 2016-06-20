@@ -1,4 +1,5 @@
-lives2
-czas100
-punkty777
-cosktos
+lives1
+czas2
+punkty10
+bonuspktmax3
+bonuspktmin1

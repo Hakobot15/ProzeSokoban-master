@@ -1,3 +1,10 @@
-Marek 123
-Zenek 24
-Leon 1
+Maciek 1000
+Andrzej 100
+Dadek 55
+NickName666 29
+NickName666 28
+NickName666 26
+NickName666 23
+Janek 22
+NickName666 21
+Krzysiu 20

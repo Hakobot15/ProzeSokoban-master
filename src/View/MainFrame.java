@@ -4,12 +4,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 /**
  *
  * Glowna ramka programu
  *
  */
 public class MainFrame extends JFrame {
+	private Future<?> gameTask;
+	private ExecutorService gameExecutor = Executors.newSingleThreadExecutor();
+
+
 	/**
 	 * Zmienna przechowujaca tytul gry
 	 */
@@ -23,10 +31,15 @@ public class MainFrame extends JFrame {
 	 */
 	private final static int DEFAULT_HIGHT = 570;
 	private String mapNames = "listaMap.txt";
-	private Action saveAction;
-	private Action newGameAction;
-	private GameAreaPanel areaPanel;
-	private GameStatePanel statePanel;
+	/**
+	 * Parametr odpowiedzialny za wybrany poziom trudnosci
+	 * hard - true
+	 */
+ 	private boolean status = false;
+	/**
+	 * Zmienna przechowujaca nazwe gracza
+	 */
+	private String nickname;
 	/**
 	 * Bezparametrowy konstruktor tworzacy glowna ramke aplikacji
 	 */
@@ -35,8 +48,10 @@ public class MainFrame extends JFrame {
 		setVisible(true);
 		setBounds(new Rectangle(DEFAULT_WIDTH, DEFAULT_HIGHT));
 		makeMenu();
+		this.setMinimumSize(new Dimension(400,400));
 		this.setResizable(true);
-		newGameStart();
+		//startNewGame(); // this does work
+		revalidate();
 	}
 
 
@@ -44,11 +59,15 @@ public class MainFrame extends JFrame {
 	 * uruchomienie nowej gry
 	 */
 	// Do new Game doodalem this(potrzebny do wylapywania watku, i dodalem wysokosc i szerokosc, potrzebne do ustalanie wielkosc tekstur
-	private void newGameStart() {
-			Thread t = new Thread(new MyRunnable(this, DEFAULT_WIDTH, DEFAULT_HIGHT, mapNames) {
-			});
-			t.start();
 
+		public void startNewGame() {
+		if (gameTask != null) gameTask.cancel(true);
+		gameTask = gameExecutor.submit(new MyRunnable(this, DEFAULT_WIDTH, DEFAULT_HIGHT, mapNames) {
+		});
+	}
+	private void startGame()
+	{
+		new LoginPanel2(this);
 	}
 	/**
 	 * Method creating mainMenu
@@ -60,7 +79,7 @@ public class MainFrame extends JFrame {
 
 		menuGame.add(new AbstractAction("Nowa gra") {
 			public void actionPerformed(ActionEvent event) {
-				newGameStart();
+				startGame();
 			}
 		});
 
@@ -106,6 +125,14 @@ public class MainFrame extends JFrame {
 		JRadioButtonMenuItem hardLevel = new JRadioButtonMenuItem("Poziom trudny");
 		levelSettings.add(easyLevel);
 		levelSettings.add(hardLevel);
+		hardLevel.addActionListener(evt -> {
+			status = true;
+
+			});
+		easyLevel.addActionListener(e ->
+		{
+			status = false;
+		});
 		ButtonGroup networkSettings = new ButtonGroup();
 		JRadioButtonMenuItem online = new JRadioButtonMenuItem("Online");
 		JRadioButtonMenuItem offline = new JRadioButtonMenuItem("Offline");
@@ -155,4 +182,23 @@ public class MainFrame extends JFrame {
 
 	}
 
+	/**
+	 * Metoda zwracajaca nazwe gracza
+	 * @return String zawierajacy nazwe gracza
+     */
+	public String getNickname() {
+		return nickname;
+	}
+
+	/**
+	 * Metoda ustawiajaca nazwe gracza
+	 * @param nickname
+     */
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public boolean isStatus() {
+		return status;
+	}
 }

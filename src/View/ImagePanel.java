@@ -6,6 +6,7 @@ import Model.LevelLoader;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 class ImagePanel extends JPanel implements ComponentListener, WindowStateListener{
     /**
@@ -23,7 +24,7 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
     /**
      * Jest to JPanel na ktorym bedziemy wywolywac malowanie, lisnery
      */
-    private JFrame frame;
+    private MainFrame frame;
     /**
      * Zmienna przechowujaca aktualnie posiadane zycia
      */
@@ -31,26 +32,31 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
     /**
      * Zmienna przechowujaca odczytany czas na mape
      */
-    private  int czasGry;
+    private  double czasGry;
     /**
      * Zmienna przechowujaca pozostaly czas na wykonanie celow mapy
      */
     private String runingTime;
     /**
-     * zmienna potrzebna do odliczania czasu;
-     */
-    private int counter = 1;
-    /**
      * Zmienna przechowujaca warunek skonczenia planszy
      */
     private boolean completed = false;
+    private int score;
+    private GameAreaPanel area;
+    private ImagePanel imPanel;
+    private ArrayList<Integer> TimeSpawn;
+    private int bonusPoints =0;
 
-
-    public ImagePanel(Image img, JFrame frame, int DX,int DY, String tmp, int liczbaZyc) {
+    public ImagePanel(Image img, MainFrame frame, int DX,int DY, String tmp, int liczbaZyc, int score, int przelicznikCzasu, GameAreaPanel area) {
+        this.area = area;
+        TimeSpawn = area.getTimeSpawn();
+        this.score = score;
         this.liczbaZyc = Integer.toString(liczbaZyc);
         LevelLoader level;
         level = new LevelLoader(tmp);
-        czasGry = level.getTime();
+        if(frame.isStatus())
+        czasGry = (double)level.getTime();
+        else czasGry = level.getTime()*przelicznikCzasu;
         spaceX = DX;
         spaceY = DY;
         this.frame = frame;
@@ -58,10 +64,11 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
         setLayout(null);
         addComponentListener(this);
         frame.addWindowStateListener(this);
-        runingTime = Integer.toString(czasGry)+1;
+        runingTime = Double.toString(czasGry)+1;
         wyswietlanieCzasu(); // wyswietla czas gry
         this.setPreferredSize(new Dimension(DX,DY)); // ustalanie wielkosc
         frame.getContentPane().add(this,BorderLayout.NORTH); // ustalanie pozycji
+        imPanel=this;
     }
 
     /**
@@ -72,24 +79,30 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
         @Override
         public void run() {
             try {
-                while (czasGry >= 0) {
+                while (true) {
                     if(completed) {
                     Thread.currentThread().interrupt();
                     }
-                    if (czasGry == 0) {
-                        runingTime = "Out Of Time!";
+                    if (czasGry < 0) {
+                        runingTime = "Out Of Life!";
                         completed = true;
                     }
                     else {
-                        runingTime = "Time left: " + Integer.toString(czasGry);
+                        runingTime = "Time left: " + String.format("%.2f", czasGry);
                     }
                     frame.repaint();
-                    Thread.sleep(20);
-                    if(counter%50==0) {
-                        czasGry--;
-                        counter++;
+                    for(int i=0;i<TimeSpawn.size();i++)
+                    {
+                        if((int)czasGry==TimeSpawn.get(i))
+                        {
+                            area.spawnBonus(imPanel);
+                            TimeSpawn.remove(i);
+                        }
                     }
-                    else counter++;
+                    Thread.sleep(20);
+
+                        czasGry-=0.02;
+
                 }
             } catch (InterruptedException exp) {
                 Thread.currentThread().interrupt();
@@ -106,7 +119,8 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
         g.setFont(new Font("TimesRoman", Font.PLAIN, 30));
         g.setColor(Color.GREEN);
         g.drawString(liczbaZyc,20,40);
-        g.drawString(runingTime,200,40);
+        g.drawString(runingTime,100,40);
+        g.drawString(Integer.toString(score), 350, 40);
     }
 
     /**
@@ -154,4 +168,10 @@ class ImagePanel extends JPanel implements ComponentListener, WindowStateListene
      * @return zwraca status ukonczenia mapy
      */
     public boolean getCompleted(){return completed;}
+    public double getTimeLeft(){return czasGry;}
+    public void setBonusPoints(){bonusPoints+=500;}
+
+    public int getBonusPoints() {
+        return bonusPoints;
+    }
 }

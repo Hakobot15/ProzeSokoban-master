@@ -3,9 +3,8 @@ package View;
 import Model.Settings;
 
 import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Created by DDcreo on 2016-05-14.
@@ -26,7 +25,7 @@ public class MyRunnable implements Runnable {
     /**
      * zmiennap przechowujaca ekran gry
      */
-    private JFrame frame;
+    private MainFrame frame;
     /**
      * Zmienna przechowujaca odczytany w danej chwili nazwe mapy
      */
@@ -60,7 +59,7 @@ public class MyRunnable implements Runnable {
 
     private boolean shutdown = false;
 
-    public MyRunnable(JFrame frame, int DEFAULT_WIDTH, int DEFAULT_HIGHT, String mapNames)
+    public MyRunnable(MainFrame frame, int DEFAULT_WIDTH, int DEFAULT_HIGHT, String mapNames)
     {
         this.mapNames = mapNames;
         this.frame = frame;
@@ -73,8 +72,8 @@ public class MyRunnable implements Runnable {
         try {
             tmpReader = new BufferedReader(new FileReader(mapNames));
             if ((tmp = tmpReader.readLine()) != null) {
-                tmpCurrentState = new GameStatePanel(frame, tmp, liczbaZyc);
                 tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
+                tmpCurrentState = new GameStatePanel(frame, tmp, liczbaZyc, score, przelicznikCzasu,tmpCurrentArea);
                 tmpCurrentArea.repaint();
                 tmpCurrentState.getPanel().repaint();
                 frame.revalidate();
@@ -104,8 +103,15 @@ public class MyRunnable implements Runnable {
                     if(liczbaZyc<0) {
                         shutdown = true;
                         tmpCurrentArea.setCompleted();
+                        frame.remove(tmpCurrentArea);
+                        frame.remove(tmpCurrentState.getPanel());
+                        frame.revalidate();
+                        set10Scores();
+                        JOptionPane.showMessageDialog(null, "Gratulacje uzyskałeś wynik: "+score);
                         Thread.currentThread().interrupt();
+
                         return;
+
                     }
 
                     rebootMapy();
@@ -131,12 +137,10 @@ public class MyRunnable implements Runnable {
             }
             if ((tmp = tmpReader.readLine()) != null ) {
                 frame.remove(tmpCurrentArea);
-                frame.revalidate();
+
                 frame.remove(tmpCurrentState.getPanel());
-                frame.revalidate();
-                tmpCurrentState = new GameStatePanel( frame, tmp, liczbaZyc);
-                frame.revalidate();
                 tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
+                tmpCurrentState = new GameStatePanel( frame, tmp, liczbaZyc,score, przelicznikCzasu, tmpCurrentArea);
                 frame.revalidate();
             }
         } catch (IOException e) {
@@ -154,7 +158,6 @@ public class MyRunnable implements Runnable {
      * Wczytanie nowego poziomu mapy
      */
     public void wywolanieMapy() {
-       // score += tmpCurrentState.panel.getCzasGry()*tmpCurrentArea.get;
         try {
             tmpReader = new BufferedReader(new FileReader(mapNames));
             for (int i = 0; i<=licznik;i++)
@@ -162,16 +165,29 @@ public class MyRunnable implements Runnable {
                 tmpReader.readLine();
             }
             if ((tmp = tmpReader.readLine()) != null ) {
+                if(frame.isStatus())
+                score += tmpCurrentState.getPanel().getTimeLeft()*przelicznikPunktow+tmpCurrentState.getPanel().getBonusPoints();
+                else score += tmpCurrentState.getPanel().getTimeLeft()+tmpCurrentState.getPanel().getBonusPoints();
                 tmpCurrentState.getPanel().setCompleted();
                 licznik++;
                 frame.remove(tmpCurrentArea);
+                frame.remove(tmpCurrentState.getPanel());
+                tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
+                tmpCurrentState = new GameStatePanel( frame, tmp, liczbaZyc,score, przelicznikCzasu,tmpCurrentArea);
                 frame.revalidate();
+            }
+            else
+            {
+                if(frame.isStatus())
+                    score += tmpCurrentState.getPanel().getTimeLeft()*przelicznikPunktow+tmpCurrentState.getPanel().getBonusPoints();
+                else score += tmpCurrentState.getPanel().getTimeLeft()+tmpCurrentState.getPanel().getBonusPoints();
+                shutdown = true;
+                tmpCurrentArea.setCompleted();
+                frame.remove(tmpCurrentArea);
                 frame.remove(tmpCurrentState.getPanel());
                 frame.revalidate();
-                tmpCurrentState = new GameStatePanel( frame, tmp, liczbaZyc);
-                frame.revalidate();
-                tmpCurrentArea = new GameAreaPanel(tmp, frame, DEFAULT_WIDTH, DEFAULT_HIGHT);
-                frame.revalidate();
+                set10Scores();
+                JOptionPane.showMessageDialog(null, "Gratulacje ukończyłeś wszystkie mapy z wynikiem: "+score);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -182,5 +198,75 @@ public class MyRunnable implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+    public void set10Scores()
+    {
+        String fileName = "info\\highScore.txt";
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+        ArrayList<String> tmpList = new ArrayList<>();
+        try {
+            reader = new BufferedReader(new FileReader(fileName));
+            String tmp = null;
+            while ((tmp = reader.readLine()) != null) {
+                        tmpList.add(tmp);
+            }
+            if(tmpList.size()<10)
+            for(int i=0;i<tmpList.size()+1;i++)
+            {
+                if(i==tmpList.size())
+                {
+                    //Tutaj wstawiamy nicname
+                    tmpList.add(i,"NickName "+score);
+                    break;
+                }
+                String[] parts = tmpList.get(i).split(" ");
+                int tmpScore= Integer.parseInt(parts[1]);
+                if(score>tmpScore)
+                {
+                    //tutaj wstawiamy nickname
+                    tmpList.add(i,"NickName666 "+score);
+                break;
+                }
+
+            }
+            else {
+                for (int i = 0; i < tmpList.size(); i++) {
+                    String[] parts = tmpList.get(i).split(" ");
+                    int tmpScore = Integer.parseInt(parts[1]);
+                    if (score > tmpScore) {
+                        tmpList.add(i, "NickName666 " + score);
+                        tmpList.remove(tmpList.size()-1);
+                        break;
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            writer = new BufferedWriter(new FileWriter(fileName));
+            for(int i =0; i<tmpList.size();i++)
+            {
+                writer.write(tmpList.get(i));
+                writer.newLine();
+            }
+        } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     }
 }

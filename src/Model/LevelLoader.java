@@ -71,7 +71,10 @@ public class LevelLoader {
      * zmienne przechowujace polozenie gracza
      */
     private PlayerElement player;
-
+    /**
+     * Lista przechowujaca podlogi mapy
+     */
+    private ArrayList<FloorElement> floors = new ArrayList<>();
 
     /**
      * @param fileName sciezka pliku z mapa
@@ -102,6 +105,7 @@ public class LevelLoader {
                  */
                 if (item == DEFAULT_PLAYER) // player
                 {
+                    floors.add(new FloorElement(j,i-1));
                     player = new PlayerElement(j, i - 1);
                     map.add(new FloorElement(j, i - 1));
 
@@ -119,6 +123,7 @@ public class LevelLoader {
                  */
                 else if (item == DEFAULT_CHEST) // box
                 {
+                    floors.add(new FloorElement(j,i-1));
                     map.add(new FloorElement(j, i - 1));
                     chests.add(new ChestElement(j,i-1));
                 }
@@ -127,6 +132,7 @@ public class LevelLoader {
                  */
                 else if (item == DEFAULT_GOAL) // goal-spot
                 {
+                    floors.add(new FloorElement(j,i-1));
                     map.add(new GoalElement(j, i - 1));
                     goals.add(new GoalElement(j,i-1));
                 }
@@ -135,10 +141,12 @@ public class LevelLoader {
                  */
                 else if (item == DEFAULT_FLOOR) // floor
                 {
+                    floors.add(new FloorElement(j,i-1));
                     map.add(new FloorElement(j, i - 1));
                 }
             }
         }
+
     }
 
     /**
@@ -192,5 +200,13 @@ public class LevelLoader {
      * @return Zwraca list scian na mapie
      */
     public ArrayList<WallElement> getWalls () {return walls;}
+
+    /**
+     *
+     * @return Zwraca liste podlog na mapie
+     */
+    public ArrayList<FloorElement> getFloors() {
+        return floors;
+    }
 }
 

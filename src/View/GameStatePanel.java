@@ -1,7 +1,8 @@
 package View;
 import javax.swing.*;
 import java.awt.*;
-
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 
 /**
@@ -21,15 +22,17 @@ public class GameStatePanel extends JPanel {
      */
     private ImagePanel panel;
 
-    public GameStatePanel(JFrame frame, String tmp, int liczbaZyc) {
-        panel = new ImagePanel(new ImageIcon("pic\\background.jpg").getImage(),frame,DEFAULT_SPACEX, DEFAULT_SPACEY, tmp, liczbaZyc );
+    public GameStatePanel(MainFrame frame, String tmp, int liczbaZyc, int score, int przelicznikCzasu, GameAreaPanel area) {
+        panel = new ImagePanel(new ImageIcon("pic\\background.jpg").getImage(), frame, DEFAULT_SPACEX, DEFAULT_SPACEY, tmp, liczbaZyc, score, przelicznikCzasu, area);
 
 
     }
 
     /**
-     *
      * @return Zwraca nasze tlo
      */
-    public ImagePanel getPanel(){return panel;}
+    public ImagePanel getPanel() {
+        return panel;
+    }
+
 }
